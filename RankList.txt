@@ -1,0 +1,108 @@
+using System;
+using System.Collections.Generic;
+using System.Linq;
+using System.Text;
+using System.Threading.Tasks;
+
+namespace Rank_Stat
+{
+    public class Student
+    {
+
+        public Dictionary<string, Int16> StudDetails()
+        {
+            
+            Dictionary<string, Int16> StudentList = new Dictionary<string, Int16>();
+            StudentList.Add("Raj", 490);
+            StudentList.Add("Kamal", 400);
+            StudentList.Add("Mohammed", 490);
+            StudentList.Add("Rajini", 350);
+            StudentList.Add("John", 490);
+            //StudentList.Add("Britto", 489);
+
+            Console.WriteLine("STUDENTS LIST\n\n{0,-15}\t{1,-15}","NAME","TOTAL MARKS");
+            foreach (KeyValuePair<string, Int16> author in StudentList)
+            {
+                Console.WriteLine("{0,-15}\t{1,-15}", author.Key, author.Value);
+            }
+            return StudentList;
+	}
+
+}
+}
+-------------------------------------------------------------------------------------------------
+
+
+
+using System;
+using System.Collections.Generic;
+using System.Linq;
+using System.Text;
+using System.Threading.Tasks;
+
+namespace Rank_Stat
+{
+    class Rank_Stud:Student
+    {
+        public void RankStudent(Dictionary<string, Int16> studentlist)
+        {
+            var items = from pair in studentlist orderby pair.Value descending select pair;
+            var previous = 0;
+            int count = 0;
+            Console.WriteLine("\n{0,-15}\t{1,-15}\t{2,-10}", "NAME","TOTAL MARKS", "RANK");
+            foreach (KeyValuePair<string, Int16> pair in items)
+            {
+                var next = pair.Value;
+
+                if (previous != next)
+                {
+                    count++;
+                    Console.WriteLine("{0,-15}\t{1,-15}\t{2,-12}", pair.Key, pair.Value, count);
+
+                }
+                else if (previous == next)
+                {
+                    Console.WriteLine("{0,-15}\t{1,-15}\t{2,-12}", pair.Key, pair.Value, count);
+
+                }
+
+                previous = pair.Value;
+
+            }
+            Console.WriteLine("\n");
+
+        }
+
+        public void Process()
+        {
+            Dictionary<string, Int16> StudentList = StudDetails();
+            RankStudent(StudentList);
+
+        }
+    }
+}
+
+-----------------------------------------------------------------------------------------------------
+
+
+using System;
+using System.Collections.Generic;
+using System.Linq;
+using System.Text;
+using System.Threading.Tasks;
+
+namespace Rank_Stat
+{
+    class Program
+    {
+        static void Main(string[] args)
+        {
+            //Student stud = new Student();
+            //stud.Process();
+
+            Rank_Stud rank_stud = new Rank_Stud();
+            rank_stud.Process();
+
+        }
+    }
+}

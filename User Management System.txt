@@ -1,0 +1,375 @@
+using System;
+using System.Collections.Generic;
+using System.Linq;
+using System.Text;
+using System.Threading.Tasks;
+
+namespace User_Management_System
+{
+    public class UserManagementSystem
+    {
+        const int TOTAL_EMP = 20;
+        string BranchName = null;
+        string CompanyName = null;
+        
+        public UserManagementSystem(string companyname, string branchName)
+        {
+            this.CompanyName = companyname;
+            this.BranchName = branchName;
+            Console.Clear();
+        }
+        
+        struct employee
+        {
+            public int emp_ID;
+            public string emp_name;
+            public string emp_Gender;
+            public string emp_Email_ID;
+            public int emp_MobileNum;
+            public string emp_Designation;
+
+        };
+
+        employee[] emp = new employee[TOTAL_EMP];
+
+        int choice;
+        string user_confirmation;
+        int element_count;
+
+
+        #region Process
+
+        public void Process()
+        {
+            do
+            {
+                DisplayMenu();
+                Console.WriteLine("Enter your choice: ");
+                choice = int.Parse(Console.ReadLine());
+
+                Console.Clear();
+
+                switch (choice)
+                {
+                    case 1:
+                        //add
+                        appendEmp(emp, ref element_count);
+                        break;
+                    case 2:
+                        //delete
+                        deleteEmp(emp, ref element_count);
+                        break;
+                    case 3:
+                        //update
+                        updateEmp(emp, ref element_count);
+                        break;
+                    case 4:
+                        //viewall
+                        DisplayAllEmp(emp, ref element_count);
+
+                        break;
+                    case 5:
+                        //find
+                        Find_ByEmpID(emp, ref element_count);
+                        break;
+
+                    default: Console.WriteLine("invalid input");
+                        break;
+                }
+                Console.Write("\n\nPress y or Y to continue:");
+                user_confirmation = Console.ReadLine();
+                Console.Clear();
+            }
+            while (user_confirmation == "y" || user_confirmation == "Y");
+            Console.WriteLine("\nTHANK YOU");
+        }
+
+        #endregion
+
+        #region Display Menu 
+        private void DisplayMenu()
+        {
+            Console.WriteLine("\n              {0}                 ", this.CompanyName);
+            Console.WriteLine("\nBranch Name: " + this.BranchName);
+            Console.WriteLine("\n                   MENU                ");
+            Console.WriteLine("\n 1. Add Employee Details");
+            Console.WriteLine(" 2. Delete Employee Details");
+            Console.WriteLine(" 3. Update Employee Details");
+            Console.WriteLine(" 4. View all Employee");
+            Console.WriteLine(" 5. Find a Employee by ID");
+            Console.WriteLine("\n**-**-**-**-**-**-**-**-**-**-**-**-**-**-**-**-**-**-**\n");
+
+        }
+        
+        #endregion
+
+        #region Add Emp
+
+        private void appendEmp(employee[] emp, ref int element_count)
+        {
+        Again:
+
+            Console.WriteLine("ADDING EMPLOYEE DETAILS");
+            Console.Write("\nEnter Employee ID:");
+
+            emp[element_count].emp_ID = int.Parse(Console.ReadLine());
+
+
+            if (searchID(emp, emp[element_count].emp_ID, element_count) != -1)
+            {
+                Console.Clear();
+                Console.WriteLine("The entered ID number already exists");
+                goto Again;
+            }
+
+            Console.Write("\nEnter Employee's Name:");
+            emp[element_count].emp_name = Console.ReadLine();
+
+            Console.Write("\nEnter Employee's Gender (F or M):");
+            emp[element_count].emp_Gender = Console.ReadLine();
+
+            Console.Write("\nEnter Employee's Email ID : ");
+            emp[element_count].emp_Email_ID = Console.ReadLine();
+
+            Console.Write("\nEnter Employee's Mobilr No : ");
+            emp[element_count].emp_MobileNum = int.Parse(Console.ReadLine());
+
+            Console.Write("\nEnter Employee's Designation: ");
+            emp[element_count].emp_Designation = Console.ReadLine();
+
+            ++element_count;
+
+            Console.WriteLine("\n\nAdding Employee - Successful");
+
+        }
+
+        #endregion
+
+        #region Search by ID
+
+        private int searchID(employee[] emp, int id, int element_count)
+        {
+            int found = -1;
+            for (int i = 0; i < element_count && found == -1; i++)
+            {
+
+                if (emp[i].emp_ID == id)
+                {
+                    found = i;
+                }
+                else
+                {
+                    found = -1;
+                }
+
+            }
+
+            return found;
+        }
+        
+        #endregion
+
+        #region Delete Employee Detail
+
+        private void deleteEmp(employee[] emp, ref int element_count)
+        {
+            int id;
+            int index;
+
+            if (element_count > 0)
+            {
+                Console.WriteLine("REMOVE/DELETE EMPLOYEE DETAILS");
+                Console.Write("Enter employee's ID:");
+                id = int.Parse(Console.ReadLine());
+
+                index = searchID(emp, id, element_count);
+
+                if ((index != -1) && (element_count != 0))
+                {
+                    if (index == (element_count - 1))
+                    {
+
+                        Clean(emp, index);
+                        --element_count;
+
+                        Console.WriteLine("The record is deleted.");
+                    }
+                    else
+                    {
+                        for (int i = index; i < element_count - 1; i++)
+                        {
+                            emp[i] = emp[i + 1];
+                            Clean(emp, element_count);
+                            --element_count;
+                        }
+                    }
+                }
+                else
+                    Console.WriteLine("The record doesn't exist.Check the ID and try again.");
+            }
+            else Console.WriteLine("No record to delete");
+
+        }
+        
+        #endregion
+       
+        #region Update Emp Details
+
+        private void updateEmp(employee[] emp, ref int element_count)
+        {
+            int id;
+            int storedIndex;
+
+            Console.WriteLine("UPDATE EMPLOYEE DETAILS");
+
+            Console.WriteLine("Enter Employee ID: ");
+            id = int.Parse(Console.ReadLine());
+            Console.WriteLine("\n 1. Update Employee's Name");
+            Console.WriteLine(" 2. Update Employee's Gender");
+            Console.WriteLine(" 3. Update Employee's Email ID");
+            Console.WriteLine(" 4. Update Employee Mobile No");
+            Console.WriteLine(" 5. Update Employee's Designation");
+            Console.Write("\nEnter your Choice: ");
+            storedIndex = int.Parse(Console.ReadLine());
+
+            int index = searchID(emp, id, element_count);
+
+            if ((index != -1) && (element_count != 0))
+            {
+                switch (storedIndex)
+                {
+                    case 1:
+                        Console.Write("\nEnter Employee's Name:");
+                        emp[index].emp_name = Console.ReadLine();
+                        break;
+
+                    case 2:
+                        Console.Write("\nEnter employee's Gender(F or M):");
+                        emp[index].emp_Gender = Console.ReadLine();
+                        break;
+
+                    case 3:
+                        Console.Write("\nEnter employee's Email ID:");
+                        emp[index].emp_Email_ID = Console.ReadLine();
+                        break;
+
+                    case 4:
+                        Console.WriteLine("\nEnter employee's Mobile No: ");
+                        emp[index].emp_MobileNum = int.Parse(Console.ReadLine());
+                        break;
+
+                    case 5:
+                        Console.WriteLine("\nEnter employee's Designation: ");
+                        emp[index].emp_Designation = Console.ReadLine();
+                        break;
+                    default:
+                        Console.WriteLine("\nInvalid column index"); break;
+
+                }
+
+            }
+            else Console.WriteLine("The record deosn't exits.Check the ID and try again.");
+
+        }
+        
+        #endregion
+
+        #region Display all employee details
+
+        private void DisplayAllEmp(employee[] emp, ref int element_count)
+        {
+            int item = 0;
+
+            Console.WriteLine("\t\t\t\t\t\t Employee Information\n\n");
+            Console.WriteLine("{0,-9}\t{1,-20}{2,-15}{3,-25}{4,-15}{5,-9}", "0", "1", "2", "3", "4", "5", "6");
+
+            Console.WriteLine("{0,-8}\t{1,-15}\t{2,-5}\t{3,-25}{4,-15}{5,-5}", "Emp ID", "Emp Name", "Emp Gender", "Emp Email ID", "Mob Num", "Designation");
+
+            while (item < element_count)
+            {
+                if (emp[item].emp_ID != 0)
+                {
+                    Console.Write("{0,-9}\t{1,-20}",emp[item].emp_ID, emp[item].emp_name);
+                    Console.Write("{0,-15}{1,-25}", emp[item].emp_Gender, emp[item].emp_Email_ID);
+                    Console.Write("{0,-15}{1,-9}\n", emp[item].emp_MobileNum, emp[item].emp_Designation);
+                    
+                }
+                item += 1;
+            }
+
+        }
+
+
+        #endregion
+
+        #region Find By Emp ID
+        
+        private void Find_ByEmpID(employee[] emp, ref int element_count)
+        {
+            Console.WriteLine("Search Employee");
+            Console.WriteLine("Enter Employee's ID: ");
+            int id = int.Parse(Console.ReadLine());
+
+            int index = searchID(emp, id, element_count);
+            if (index != -1)
+            {
+                Console.WriteLine("-----------------Emplyoyee Details-----------------");
+                Console.Write("{0,-9}\t{1,-20}", emp[index].emp_ID, emp[index].emp_name);
+                Console.Write("{0,-15}{1,-25}", emp[index].emp_Gender, emp[index].emp_Email_ID);
+                Console.Write("{0,-15}{1,-9}\n", emp[index].emp_MobileNum, emp[index].emp_Designation);
+            }
+            else
+            {
+                Console.WriteLine("\n\nNo employee found with ID {0}",id);
+            }
+
+        }
+
+        #endregion
+
+        private void Clean(employee[] emp, int index)
+        {
+            emp[index].emp_ID = 0;
+            emp[index].emp_name = null;
+            emp[index].emp_Gender = null;
+            emp[index].emp_Email_ID = null;
+            emp[index].emp_Designation = null;
+            emp[index].emp_MobileNum = 0;
+
+        }
+    }
+}
+
+---------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
+
+Program.cs
+
+using System;
+using System.Collections.Generic;
+using System.Linq;
+using System.Text;
+using System.Threading.Tasks;
+
+namespace User_Management_System
+{
+    class Program
+    {
+        static void Main(string[] args)
+        {
+
+            Console.WriteLine("Enter Company Name: ");
+            string Company_Name = Console.ReadLine();
+
+            Console.WriteLine("Enter Branch Name: ");
+            string Branch_Name = Console.ReadLine();
+
+            UserManagementSystem Company = new UserManagementSystem(Company_Name,Branch_Name);
+
+            Company.Process();
+
+            //Branch1.DisplayAllEmp();
+
+        }
+    }
+}
+

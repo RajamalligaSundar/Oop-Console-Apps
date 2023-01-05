@@ -1,0 +1,111 @@
+using System;
+using System.Collections.Generic;
+using System.Linq;
+using System.Text;
+using System.Threading.Tasks;
+using System.IO;
+
+namespace ConsoleApplication1
+{
+    class CSVFile
+    {
+        string inputFilePath;
+
+        public string InputFilePath
+        {
+            get { return inputFilePath; }
+            set { inputFilePath = value; }
+        }
+
+        string outputFilepath;
+
+        public string OutputFilepath
+        {
+            get { return outputFilepath; }
+            set { outputFilepath = value; }
+        }
+
+
+        public string[] ReadCSV(string inputFilePath)
+        {
+            string[] extractedData = System.IO.File.ReadAllLines(inputFilePath);
+            return extractedData;
+        }
+
+        public IEnumerable<string> MergeCSV(string[] file1, string[] file2)
+        {
+
+            IEnumerable<string> mergedData =
+                from bio in file1
+                let nameFields = bio.Split(',')
+                from id in file2
+                let otherFields = id.Split(',')
+                where Convert.ToString(nameFields[0]) == Convert.ToString(otherFields[0]) && Convert.ToString(nameFields[1]) == Convert.ToString(otherFields[1])
+                select nameFields[0] + "," + nameFields[1] + "," + nameFields[2] + "," + nameFields[3] + "," + otherFields[2] + "," + otherFields[3]
+                       + "," + otherFields[4];
+
+            return mergedData;
+        }
+
+        public void OutputQueryResults(IEnumerable<string> mergedData, string message)
+        {
+            Console.WriteLine(System.Environment.NewLine + message);
+
+            foreach (string item in mergedData)
+            {
+                Console.WriteLine(item);
+            }
+            int count = mergedData.Count() - 1;
+            Console.WriteLine("{0} total names in list", count);
+        }
+
+        public void WriteFile(IEnumerable<string> query, string path)
+        {
+            //Writing to File - WriteAllLines
+
+            File.WriteAllLines(path, query);
+            Console.WriteLine("Write All Lines Successfull");
+        }
+
+    }
+}
+
+-----------------------------------------------------------------------
+
+
+using System;
+using System.Collections.Generic;
+using System.Linq;
+using System.Text;
+using System.Threading.Tasks;
+
+namespace ConsoleApplication1
+{
+    class Program
+    {
+        static void Main(string[] args)
+        {
+            //path
+
+            string outputPath = @"C:\\Users\\Rajamalliga Sundar\\Documents\\visual studio 2012\\Projects\\Exercise_1\\output.csv";
+            string filepath1 = @"C:\\Users\\Rajamalliga Sundar\\Documents\\visual studio 2012\\Projects\\Exercise_1\\csvfile1.csv";
+            string filepath2 = @"C:\\Users\\Rajamalliga Sundar\\Documents\\visual studio 2012\\Projects\\Exercise_1\\csvfile2.csv";
+
+            //obj
+            CSVFile output = new CSVFile();
+
+            CSVFile file1 = new CSVFile();
+            string[] file1Text = file1.ReadCSV(filepath1);
+
+
+            CSVFile file2 = new CSVFile();
+            string[] file2Text = file1.ReadCSV(filepath2);
+
+            IEnumerable<string> mergedData = output.MergeCSV(file1Text, file2Text);
+
+            output.OutputQueryResults(mergedData, "Merge two spreadsheets:");
+
+            output.WriteFile(mergedData, outputPath);
+        }
+    }
+}
